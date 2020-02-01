@@ -5,3 +5,4 @@ Keras==2.3.1
 Pillow==7.0.0
 pathlib==1.0.1
 tensorflow==1.14.0
+googletrans==2.4.0

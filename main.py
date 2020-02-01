@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 import os
 import pya3rt
+from googletrans import Translator
 from PIL import Image
 from keras.applications.vgg16 import VGG16, preprocess_input, decode_predictions
 from keras.preprocessing import image
@@ -18,9 +19,9 @@ from linebot.models import(
 )
 
 app=Flask(__name__)
-
-line_bot_api = LineBotApi('x/5u4VOimDguUTui1U0MCyEOBJirKp4eOZ5UW1QWYbz6oHJVwaH802RBb8T4OFfFNws/u7fGj6QhQfDztyHxmSByj7kJDbG1RpAl0X/x6AQGg4cxYx2vaNQ81WEVcYbc/1EBHJhI6DMD3rc6TSy1kwdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('58a641c0aaf910df8ac0a5f8c3e60771')
+translator = Translator()
+line_bot_api = LineBotApi('KGDQXjG0Ejq/78oKURA5vBitMuWeUWSZFixddvR/pk6CdUKJL5icOT6RWNnD30q+Nws/u7fGj6QhQfDztyHxmSByj7kJDbG1RpAl0X/x6AQvdGtAoEaHd32OB5anOVNYENOYa+Rp2JDpbn6Lr0jD+wdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('576dc6cd6186cfbfd9f97baebb40cf44')
 
 @app.route("/callback",methods=['POST'])
 def callback():
@@ -55,7 +56,7 @@ def handle_image(event):
 
     line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=vga('images/gazo.jpg')))
+            TextSendMessage(text=vgg('images/gazo.jpg')))
     
 def create_reply(user_text):
     apikey="DZZK8lrwFyRhL8rOtGlmhCizKN2we20G"
@@ -64,7 +65,7 @@ def create_reply(user_text):
 
     return res['results'][0]['reply']
 
-def vga(i):
+def vgg(i):
     filename = i
     # モデルの設定
     model = VGG16(weights='imagenet')
@@ -77,11 +78,11 @@ def vga(i):
     preds = model.predict(preprocess_input(x))
     results = decode_predictions(preds, top=5)[0]
     # 推論結果を出
-    return results[0][1]
-
+    txt=translator.translate(results[0][1], dest='ja')
+    return txt.text
 
 
 if __name__=="__main__":
     port=int(os.getenv("PORT",5000))
     app.run(host='0.0.0.0',port=port)
-    app.run()
+    
