@@ -24,7 +24,6 @@ translator = Translator()
 line_bot_api = LineBotApi(os.environ['LINEBOTAPI'])
 handler = WebhookHandler(os.environ['WEBHOOKHANDLER'])
 
-
 @app.route("/callback",methods=['POST'])
 def callback():
     signature=request.headers['X-Line-Signature']
