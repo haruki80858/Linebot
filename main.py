@@ -52,7 +52,7 @@ def handle_image(event):
     message_id = event.message.id
     message_content = line_bot_api.get_message_content(message_id)
     with open(Path(f"images/gazo.jpg").absolute(), "wb") as f:
-	print("[INFO] image is opening")
+        print("[INFO] image is opening")
         for chunk in message_content.iter_content():
             f.write(chunk)
 
