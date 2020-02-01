@@ -21,8 +21,9 @@ from linebot.models import(
 
 app=Flask(__name__)
 translator = Translator()
-line_bot_api = LineBotApi('KGDQXjG0Ejq/78oKURA5vBitMuWeUWSZFixddvR/pk6CdUKJL5icOT6RWNnD30q+Nws/u7fGj6QhQfDztyHxmSByj7kJDbG1RpAl0X/x6AQvdGtAoEaHd32OB5anOVNYENOYa+Rp2JDpbn6Lr0jD+wdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('576dc6cd6186cfbfd9f97baebb40cf44')
+line_bot_api = LineBotApi(os.environ['LINEBOTAPI'])
+handler = WebhookHandler(os.environ['WEBHOOKHANDLER'])
+
 
 @app.route("/callback",methods=['POST'])
 def callback():
@@ -62,8 +63,7 @@ def handle_image(event):
             TextSendMessage(text=vgg('images/gazo.jpg')))
     
 def create_reply(user_text):
-    apikey="DZZK8lrwFyRhL8rOtGlmhCizKN2we20G"
-    client=pya3rt.TalkClient(apikey)
+    client=pya3rt.TalkClient(os.environ['REPLY_APIKEY'])
     res=client.talk(user_text)
 
     return res['results'][0]['reply']
@@ -84,7 +84,7 @@ def vgg(i):
 
     response = requests.post(ENDPOINT_URL,
                              data=json.dumps({"requests": img_requests}).encode(),
-                             params={'key': 'AIzaSyCEL8h7B73Fb1L_m0QZMVI5_V87xQ8BpLc'},
+                             params={'key':os.environ['CLOUD_VISION_API']},
                              headers={'Content-Type': 'application/json'})
     txt=translator.translate(response.json()['responses'][0]['labelAnnotations'][0]['description'], dest='ja')
     return txt.text
