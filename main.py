@@ -1,12 +1,13 @@
+from base64 import b64encode
+from sys import argv
+import json
+import requests
 import numpy as np
 from pathlib import Path
 import sys
 import os
 import pya3rt
 from googletrans import Translator
-from PIL import Image
-from keras.applications.vgg16 import VGG16, preprocess_input, decode_predictions
-from keras.preprocessing import image
 from flask import Flask, request, abort
 from linebot import(
         LineBotApi, WebhookHandler
@@ -68,20 +69,27 @@ def create_reply(user_text):
     return res['results'][0]['reply']
 
 def vgg(i):
-    filename = i
-    # モデルの設定
-    model = VGG16(weights='imagenet')
-    # 入力するデータを読み込み整形
-    img = image.load_img(filename, target_size=(224, 224))
-    # 画像を配列に変換
-    x = image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)
-    # モデルにかけて推論
-    preds = model.predict(preprocess_input(x))
-    results = decode_predictions(preds, top=5)[0]
-    # 推論結果を出
-    txt=translator.translate(results[0][1], dest='ja')
+
+    ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
+    img_requests = []
+    with open(i, 'rb') as f:
+            ctxt = b64encode(f.read()).decode()
+            img_requests.append({
+                    'image': {'content': ctxt},
+                    'features': [{
+                        'type': 'LABEL_DETECTION',
+                        'maxResults': 5
+                    }]
+            })
+
+    response = requests.post(ENDPOINT_URL,
+                             data=json.dumps({"requests": img_requests}).encode(),
+                             params={'key': 'AIzaSyCEL8h7B73Fb1L_m0QZMVI5_V87xQ8BpLc'},
+                             headers={'Content-Type': 'application/json'})
+    txt=translator.translate(response.json()['responses'][0]['labelAnnotations'][0]['description'], dest='ja')
     return txt.text
+
+
 
 
 if __name__=="__main__":
